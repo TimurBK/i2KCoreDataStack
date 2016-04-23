@@ -79,13 +79,17 @@
 	return [self initWithStoreType:i2KCDPStoreTypeInMemory storeURL:storeURL modelURL:modelURL options:automigratingOptions];
 }
 
-- (NSManagedObjectContext *)contextWithParent:(NSManagedObjectContext * _Nullable)parentContext concurrencyType:(NSManagedObjectContextConcurrencyType)concurrencyType persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
+- (NSManagedObjectContext *)contextWithParent:(NSManagedObjectContext * _Nullable)parentContext concurrencyType:(NSManagedObjectContextConcurrencyType)concurrencyType persistentStoreCoordinator:(NSPersistentStoreCoordinator * _Nullable)coordinator
 {
+	NSAssert(!(parentContext != nil && coordinator != nil) , @"Either parentContext or persistentStoreCoordinator should be provided but not both");
+	NSAssert(!(parentContext == nil && coordinator == nil) , @"Either parentContext or persistentStoreCoordinator should be provided");
 	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:concurrencyType];
 	if (parentContext != nil) {
 		context.parentContext = parentContext;
 	}
-	context.persistentStoreCoordinator = coordinator;
+	if (coordinator != nil) {
+		context.persistentStoreCoordinator = coordinator;
+	}
 	context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 	context.undoManager = nil;
 

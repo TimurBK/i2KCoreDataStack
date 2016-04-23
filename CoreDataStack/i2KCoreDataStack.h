@@ -71,7 +71,8 @@ typedef NS_ENUM(NSInteger, i2KCDPStoreType) {
 - (instancetype)initWithAutoMigratingInMemoryStoreWithModelName:(NSString *)modelName;
 
 /**
- *  Creates context with specified parameters. If you provide parent context, make really sure you need it as parent-child setup may hurt performance.
+ *  Creates context with specified parameters. Either parent context or persistent store coordinator must be provided.
+ *	If you provide parent context, make really sure you need it as parent-child setup may hurt performance.
  *
  *  @param parentContext   Context to be set as parent context for returning one.
  *  @param concurrencyType Concurrency type of context (NSPrivateQueueConcurrencyType or NSMainQueueConcurrencyType).
@@ -79,7 +80,7 @@ typedef NS_ENUM(NSInteger, i2KCDPStoreType) {
  *
  *  @return Instance of NSManagedObjectContext with specified parammeters.
  */
-- (NSManagedObjectContext *)contextWithParent:(NSManagedObjectContext * _Nullable)parentContext concurrencyType:(NSManagedObjectContextConcurrencyType)concurrencyType persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator;
+- (NSManagedObjectContext *)contextWithParent:(NSManagedObjectContext * _Nullable)parentContext concurrencyType:(NSManagedObjectContextConcurrencyType)concurrencyType persistentStoreCoordinator:(NSPersistentStoreCoordinator * _Nullable)coordinator;
 
 /**
  *  Creates private queue context directly connected to default persistent store coordinator.
