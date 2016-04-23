@@ -9,15 +9,19 @@
 #import "MasterViewController.h"
 #import "DetailViewController.h"
 
+#import "i2KCoreDataStack.h"
+
 @interface MasterViewController ()
 
 @property NSMutableArray *objects;
+
 @end
 
 @implementation MasterViewController
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
+
 	// Do any additional setup after loading the view, typically from a nib.
 	self.navigationItem.leftBarButtonItem = self.editButtonItem;
 

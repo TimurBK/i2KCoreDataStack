@@ -92,20 +92,40 @@
 	return context;
 }
 
-- (NSManagedObjectContext *)createPrivateQueueContext
+- (NSManagedObjectContext *)createPrivateQueueContextWithDefaultCoordinator
 {
-	return [self contextWithParent:self.mainManagedObjectContext concurrencyType:NSPrivateQueueConcurrencyType persistentStoreCoordinator:self.defaultCoordinator];
+	return [self createPrivateQueueContextWithCoordinator:self.defaultCoordinator];
 }
 
-- (NSManagedObjectContext *)createMainQueueContext
+- (NSManagedObjectContext *)createMainQueueContextWithDefaultCoordinator
 {
-	return [self contextWithParent:self.mainManagedObjectContext concurrencyType:NSMainQueueConcurrencyType persistentStoreCoordinator:self.defaultCoordinator];
+	return [self createMainQueueContextWithCoordinator:self.defaultCoordinator];
 }
 
 - (NSManagedObjectContext *)createBackgroundImportContext
 {
 	NSPersistentStoreCoordinator *coordinator = [self createPersistentStoreCoordinatorWithStoreType:NSSQLiteStoreType model:self.model storeURL:self.storeURL options:self.persistenceOptions];
+	return [self createPrivateQueueContextWithCoordinator:coordinator];
+}
+
+- (NSManagedObjectContext *)createPrivateQueueContextWithCoordinator:(NSPersistentStoreCoordinator *)coordinator
+{
 	return [self contextWithParent:nil concurrencyType:NSPrivateQueueConcurrencyType persistentStoreCoordinator:coordinator];
+}
+
+- (NSManagedObjectContext *)createMainQueueContextWithCoordinator:(NSPersistentStoreCoordinator *)coordinator
+{
+	return [self contextWithParent:nil concurrencyType:NSMainQueueConcurrencyType persistentStoreCoordinator:coordinator];
+}
+
+- (NSManagedObjectContext *)createPrivateQueueContextWithParentContext:(NSManagedObjectContext *)parentContext
+{
+	return [self contextWithParent:parentContext concurrencyType:NSPrivateQueueConcurrencyType persistentStoreCoordinator:parentContext.persistentStoreCoordinator];
+}
+
+- (NSManagedObjectContext *)createMainQueueContextWithParentContext:(NSManagedObjectContext *)parentContext
+{
+	return [self contextWithParent:parentContext concurrencyType:NSMainQueueConcurrencyType persistentStoreCoordinator:parentContext.persistentStoreCoordinator];
 }
 
 #pragma mark - Internal
@@ -127,9 +147,9 @@
 
 	self.defaultCoordinator = [self createPersistentStoreCoordinatorWithStoreType:self.cdStoreType model:self.model storeURL:self.storeURL options:self.persistenceOptions];
 
-	self.mainManagedObjectContext = [self contextWithParent:nil concurrencyType:NSMainQueueConcurrencyType persistentStoreCoordinator:self.defaultCoordinator];
+	self.mainManagedObjectContext = [self createMainQueueContextWithDefaultCoordinator];
 	self.importManagedObjectContext = [self createBackgroundImportContext];
-	self.dataExportManagedObjectContext = [self createPrivateQueueContext];
+	self.dataExportManagedObjectContext = [self createPrivateQueueContextWithDefaultCoordinator];
 
 	NSAssert(self.mainManagedObjectContext != nil, @"Failed to create main managed object context");
 	NSAssert(self.importManagedObjectContext != nil, @"Failed to create import managed object context");

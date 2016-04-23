@@ -36,6 +36,11 @@ typedef NS_ENUM(NSInteger, i2KCDPStoreType) {
 @property (nonatomic, strong, readonly) NSManagedObjectContext *importManagedObjectContext;
 
 /**
+ *  Default persistent store coordinator
+ */
+@property (nonatomic, strong, readonly) NSPersistentStoreCoordinator *defaultCoordinator;
+
+/**
  *  Designated initializer for stack
  *
  *  @param storeType Store type, currently only SQLite and inmemory are supported
@@ -65,10 +70,75 @@ typedef NS_ENUM(NSInteger, i2KCDPStoreType) {
  */
 - (instancetype)initWithAutoMigratingInMemoryStoreWithModelName:(NSString *)modelName;
 
+/**
+ *  Creates context with specified parameters. If you provide parent context, make really sure you need it as parent-child setup may hurt performance.
+ *
+ *  @param parentContext   Context to be set as parent context for returning one.
+ *  @param concurrencyType Concurrency type of context (NSPrivateQueueConcurrencyType or NSMainQueueConcurrencyType).
+ *  @param coordinator     Instance of NSPersistentStoreCoordinator for context to connect to.
+ *
+ *  @return Instance of NSManagedObjectContext with specified parammeters.
+ */
 - (NSManagedObjectContext *)contextWithParent:(NSManagedObjectContext * _Nullable)parentContext concurrencyType:(NSManagedObjectContextConcurrencyType)concurrencyType persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator;
-- (NSManagedObjectContext *)createPrivateQueueContext;
-- (NSManagedObjectContext *)createMainQueueContext;
+
+/**
+ *  Creates private queue context directly connected to default persistent store coordinator.
+ *
+ *  @return Instance of NSManagedObjectContext with NSPrivateQueueConcurrencyType directly connected to default NSPersistentStoreCoordinator.
+ */
+- (NSManagedObjectContext *)createPrivateQueueContextWithDefaultCoordinator;
+
+/**
+ *  Creates main queue context directly connected to default persistent store coordinator.
+ *
+ *  @return Instance of NSManagedObjectContext with NSMainQueueConcurrencyType directly connected to default NSPersistentStoreCoordinator.
+ */
+- (NSManagedObjectContext *)createMainQueueContextWithDefaultCoordinator;
+
+/**
+ *  Creates private queue context directly connected to persistent store coordinator. Since persistent store coordinator
+ *	is not the same as default one, it may be useful for large import operations as it won't block coordinator of
+ *	default main queue context.
+ *
+ *  @return Instance of NSManagedObjectContext with NSPrivateQueueConcurrencyType directly connected to instance of NSPersistentStoreCoordinator.
+ */
 - (NSManagedObjectContext *)createBackgroundImportContext;
+
+/**
+ *  Creates private queue context with parent context. Make sure you really need parent-child context setup as it may hurt performance.
+ *
+ *  @param parentContext Context to be set as parent context for returning one.
+ *
+ *  @return Instance of NSManagedObjectContext with NSMainQueueConcurrencyType with parent context set.
+ */
+- (NSManagedObjectContext *)createPrivateQueueContextWithParentContext:(NSManagedObjectContext *)parentContext;
+
+/**
+ *  Creates main queue context with parent context. Make sure you really need parent-child context setup as it may hurt performance.
+ *
+ *  @param parentContext Context to be set as parent context for returning one.
+ *
+ *  @return Instance of NSManagedObjectContext with NSMainQueueConcurrencyType with parent context set.
+ */
+- (NSManagedObjectContext *)createMainQueueContextWithParentContext:(NSManagedObjectContext *)parentContext;
+
+/**
+ *  Creates private queue context directly connected to provided persistent store coordinator.
+ *
+ *  @param coordinator Instance of NSPersistentStoreCoordinator for context to connect to.
+ *
+ *  @return Instance of NSManagedObjectContext with NSPrivateQueueConcurrencyType directly connected to provided NSPersistentStoreCoordinator.
+ */
+- (NSManagedObjectContext *)createPrivateQueueContextWithCoordinator:(NSPersistentStoreCoordinator *)coordinator;
+
+/**
+ *  Creates main queue context directly connected to provided persistent store coordinator.
+ *
+ *  @param coordinator Instance of NSPersistentStoreCoordinator for context to connect to.
+ *
+ *  @return Instance of NSManagedObjectContext with NSMainQueueConcurrencyType directly connected to provided NSPersistentStoreCoordinator.
+ */
+- (NSManagedObjectContext *)createMainQueueContextWithCoordinator:(NSPersistentStoreCoordinator *)coordinator;
 
 @end
 
